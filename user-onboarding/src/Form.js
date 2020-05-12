@@ -1,6 +1,64 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import * as Yup from 'yup';
+import axios from 'axios';
 
 const Form = (props) => {
+
+    /***************
+     HOOKS
+     ***************/
+
+        //state hooks
+    const [formState, setFormState] = useState({name: ``, email: ``, password: ``, terms: false});
+    const [submitDisabled, setSubmitDisabled] = useState(true);
+    const [errorState, setErrorState] = useState({name: ``, email: ``, password: ``, terms: false});
+
+    //effect hooks
+    useEffect(() => {
+        formSchema.isValid(formState).then(valid => {
+            setSubmitDisabled(!valid);
+        });
+    }, [formState]);
+
+    /***************
+     VALIDATION SCHEMA
+     ***************/
+
+    const formSchema = Yup.object().shape({
+        email: Yup
+            .string()
+            .email("Must be a valid email address.")
+            .required("Must include email address."),
+        password: Yup
+            .string()
+            .min(6, "Passwords must be at least 6 characters long.")
+            .required("Password is Required"),
+        terms: Yup
+            .boolean()
+            .oneOf([true], "You must accept Terms and Conditions")
+    });
+
+    /***************
+     EVENT HANDLERS
+     ***************/
+
+    const handleInput = (event) => {
+        setFormState({...formState, [event.target.name]: event.target.value})
+    }
+
+    const handleCheckInput = (event) => {
+        setFormState({...formState, [event.target.name]: !formState.terms})
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        alert(`form submitted with ${formState.name} ${formState.email} ${formState.password} ${formState.terms}`);
+        setFormState({name: ``, email: ``, password: ``, terms: false});
+    }
+
+    /***************
+     COMPONENT
+     ***************/
 
     return (
         <form style={{
@@ -10,10 +68,11 @@ const Form = (props) => {
             alignContent: `center`,
             alignItems: `center`,
             margin: `20%`
-        }}>
-            <input type={`text`} name={`name`} placeholder={`Name`}/>
-            <input type={`text`} name={`email`} placeholder={`Email`}/>
-            <input type={`text`} name={`password`} placeholder={`Password`}/>
+        }} onSubmit={handleSubmit}>
+            <input type={`text`} name={`name`} placeholder={`Name`} value={formState.name} onChange={handleInput}/>
+            <input type={`text`} name={`email`} placeholder={`Email`} value={formState.email} onChange={handleInput}/>
+            <input type={`text`} name={`password`} placeholder={`Password`} value={formState.password}
+                   onChange={handleInput}/>
             <div style={{
                 border: `solid`,
                 display: `flex`,
@@ -24,9 +83,9 @@ const Form = (props) => {
                 width: `31%`
             }}>
                 Agree to terms?
-                <input type={`checkbox`} name={`terms`}/>
+                <input type={`checkbox`} name={`terms`} value={formState.terms} onChange={handleCheckInput}/>
             </div>
-            <button>Submit!</button>
+            <button disabled={submitDisabled}>Submit!</button>
         </form>
     )
 }
