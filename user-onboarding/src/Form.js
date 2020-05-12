@@ -53,6 +53,12 @@ const Form = (props) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         alert(`form submitted with ${formState.name} ${formState.email} ${formState.password} ${formState.terms}`);
+        axios
+            .post(`https://reqres.in/api/users`, formState)
+            .then(res => {
+                alert("success", res.data);
+            })
+            .catch(err => alert(err.response))
         setFormState({name: ``, email: ``, password: ``, terms: false});
     }
 
