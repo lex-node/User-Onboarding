@@ -12,7 +12,7 @@ const Form = (props) => {
     const [formState, setFormState] = useState({name: ``, email: ``, password: ``, terms: false});
     const [submitDisabled, setSubmitDisabled] = useState(true);
     const [errorState, setErrorState] = useState({name: ``, email: ``, password: ``, terms: false});
-
+    const [usersState, setUsersState] = useState([]);
     //effect hooks
     useEffect(() => {
         formSchema.isValid(formState).then(valid => {
@@ -57,6 +57,7 @@ const Form = (props) => {
             .post(`https://reqres.in/api/users`, formState)
             .then(res => {
                 alert("success", res.data);
+                setUsersState([...usersState, res.data]);
             })
             .catch(err => alert(err.response))
         setFormState({name: ``, email: ``, password: ``, terms: false});
@@ -67,32 +68,36 @@ const Form = (props) => {
      ***************/
 
     return (
-        <form style={{
-            display: `flex`,
-            flexDirection: `column`,
-            justifyContent: `center`,
-            alignContent: `center`,
-            alignItems: `center`,
-            margin: `20%`
-        }} onSubmit={handleSubmit}>
-            <input type={`text`} name={`name`} placeholder={`Name`} value={formState.name} onChange={handleInput}/>
-            <input type={`text`} name={`email`} placeholder={`Email`} value={formState.email} onChange={handleInput}/>
-            <input type={`text`} name={`password`} placeholder={`Password`} value={formState.password}
-                   onChange={handleInput}/>
-            <div style={{
-                border: `solid`,
+        <div>
+            <form style={{
                 display: `flex`,
                 flexDirection: `column`,
                 justifyContent: `center`,
                 alignContent: `center`,
                 alignItems: `center`,
-                width: `31%`
-            }}>
-                Agree to terms?
-                <input type={`checkbox`} name={`terms`} value={formState.terms} onChange={handleCheckInput}/>
-            </div>
-            <button disabled={submitDisabled}>Submit!</button>
-        </form>
+                margin: `20%`
+            }} onSubmit={handleSubmit}>
+                <input type={`text`} name={`name`} placeholder={`Name`} value={formState.name} onChange={handleInput}/>
+                <input type={`text`} name={`email`} placeholder={`Email`} value={formState.email}
+                       onChange={handleInput}/>
+                <input type={`text`} name={`password`} placeholder={`Password`} value={formState.password}
+                       onChange={handleInput}/>
+                <div style={{
+                    border: `solid`,
+                    display: `flex`,
+                    flexDirection: `column`,
+                    justifyContent: `center`,
+                    alignContent: `center`,
+                    alignItems: `center`,
+                    width: `31%`
+                }}>
+                    Agree to terms?
+                    <input type={`checkbox`} name={`terms`} value={formState.terms} onChange={handleCheckInput}/>
+                </div>
+                <button disabled={submitDisabled}>Submit!</button>
+            </form>
+            <pre>{JSON.stringify(usersState, null, 2)}</pre>
+        </div>
     )
 }
 
